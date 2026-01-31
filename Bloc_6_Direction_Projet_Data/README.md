@@ -1,6 +1,6 @@
-🌤️ ClimaSense — Short-term Climate Analysis & J+1 Forecasting
+🌤️ ClimaSense — J+1 Temperature Forecast Dashboard
 
-ClimaSense is a data science project focused on climate analysis of 20 French cities in 2022 and the development of a short-term temperature forecasting model (J+1) designed for operational decision support (e.g., road maintenance, frost prevention).
+ClimaSense is a data science project focused on the analysis of climatic differences between 20 French cities in 2022 and the development of a short-term temperature forecasting system (J+1) for operational decision support.
 
 The project combines:
 
@@ -10,7 +10,7 @@ The project combines:
 
 - Detection of extreme weather events based on Météo France thresholds,
 
-- A reproducible machine learning pipeline,
+- A machine learning time series forecasting,
 
 - An interactive Streamlit dashboard for decision-makers.
 
@@ -22,9 +22,9 @@ Sub-questions:
 
 - How do temperatures and precipitation evolve throughout 2022?
 
-- What climatic differences can be observed between cities?
+- What climatic differences can be observed between French cities?
 
-- Which days can be considered meteorologically extreme?
+- Which days can be considered meteorologically extreme according to Météo France thresholds?
 
 - To what extent can these variations be predicted at J+1?
 
@@ -108,12 +108,47 @@ The Streamlit app provides:
 
 - National comparison across cities.
 
-How to Run the Project
+How to Run the Project :
 
-Install dependencies :
+git clone https://github.com/BadreddinB/CDSD.git
+cd CDSD/Bloc_6_Direction_Projet_Data/ClimaSense
+
+Create a virtual environment :
+
+python -m venv venv
+
+# Windows
+venv\Scripts\activate
+
+# macOS / Linux
+source venv/bin/activate
+
+Install dependencies
 
 pip install -r requirements.txt
 
 Run notebooks in order :
 
+jupyter notebook notebooks/01_ingestion.ipynb
+jupyter notebook notebooks/02_eda.ipynb
+jupyter notebook notebooks/03_model.ipynb
 
+Launch the Streamlit dashboard :
+
+streamlit run streamlit_app/04_streamlit.py
+
+Then open your browser at:
+
+http://localhost:8501
+
+Tech Stack :
+
+- Python, Pandas, NumPy
+
+- Scikit-learn
+
+- Matplotlib, Seaborn
+
+- Streamlit
+
+- Open-Meteo API
