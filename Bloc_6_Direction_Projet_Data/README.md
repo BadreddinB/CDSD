@@ -135,7 +135,7 @@ jupyter notebook notebooks/03_model.ipynb
 
 Launch the Streamlit dashboard :
 
-streamlit run streamlit_app/04_streamlit.py
+streamlit run streamlit_app/app.py
 
 Then open your browser at:
 
