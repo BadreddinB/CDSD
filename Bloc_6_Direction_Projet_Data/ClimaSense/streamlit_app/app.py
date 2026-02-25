@@ -227,6 +227,6 @@ city_perf = predictions_df.groupby("city").apply(
 
 st.dataframe(
     city_perf.sort_values("MAE (°C)"),
-    use_container_width=True
+    width='stretch'
 )
 
