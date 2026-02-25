@@ -102,6 +102,12 @@ Bloc_5_Industrialisation/getaround-analysis-hf/
 # -----------------------------
 Bloc_5_Industrialisation/mlruns/
 
+#------------------------------
+# Fichiers lourds à ignorer
+Bloc_4_IA_Predictive_Non_Structuree/glove.6B.*.txt
+Bloc_6_Direction_Projet_Data/ClimaSense/notebooks/models/
+#------------------------------
+
 # -----------------------------
 # Environnements virtuels
 # -----------------------------
