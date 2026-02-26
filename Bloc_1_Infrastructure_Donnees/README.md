@@ -33,7 +33,9 @@ This pipeline therefore focuses on transforming external environmental and accom
 ---
 
 ## Architecture Overview
-External APIs & Web Data Lake ETL Pipeline Data Warehouse
+
+### External APIs & Web Data Lake ETL Pipeline Data Warehouse
+
 ┌─────────────────┐ ┌─────────┐ ┌────────────┐ ┌────────────┐
 │ Nominatim (GPS) │──────▶│ │ │ │ │ │
 │ Open-Meteo │──────▶│ AWS S3 │──────▶│ Transform │──────▶│ AWS RDS PG │
