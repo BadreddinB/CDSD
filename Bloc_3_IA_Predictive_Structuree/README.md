@@ -1,178 +1,150 @@
-# Uber Hot-Zones Prediction
-## Unsupervised Demand Clustering for Operational Driver Positioning
+# Uber Hot-Zones Recommendation System
 
-## Business Problem
+## Unsupervised Spatial Clustering for Operational Driver Positioning
 
-One of Uber’s key operational challenges is the geographical mismatch between available drivers and incoming ride requests.
+## Business Context
 
-When estimated waiting time exceeds 5 to 7 minutes, cancellation rates increase significantly, directly impacting:
+One of Uber’s main operational challenges is the geographical mismatch between:
 
-Customer satisfaction
+- available drivers
 
-Platform efficiency
+- incoming ride requests
 
-Driver revenue
+When passenger waiting time exceeds 5 to 7 minutes, the probability of ride cancellation increases significantly, negatively impacting:
 
-Ride completion rate
+- customer satisfaction
 
-The objective of this project is to leverage historical pickup data in order to:
+- platform efficiency
 
-✔ Identify geographically dense demand zones
-✔ Provide data-driven positioning recommendations to drivers
-✔ Reduce passenger waiting time through anticipatory supply allocation
+- driver utilization
 
-## Analytical Objective
+- ride completion rate
 
-Using historical Uber pickup data from New York City (April 2014), the goal is to:
+The objective of this project is therefore to identify geographical areas where drivers should position themselves in anticipation of demand, depending on the day of the week in New York City.
 
-Detect recurring spatial demand patterns and define operational hot-zones where drivers should position themselves depending on the day of the week.
+## Project Objective
 
-This is formulated as an unsupervised spatial clustering problem based on:
+Using historical Uber pickup data, this analysis aims to:
 
-Pickup latitude
+- detect recurring spatial demand patterns
 
-Pickup longitude
+- segment pickup locations into operational demand zones
 
-Temporal demand patterns
+- recommend positioning areas for drivers based on temporal demand patterns
 
-## Analytical Architecture
-
-The predictive workflow follows a structured machine learning pipeline:
-
-Raw Uber Pickup Data
-        ↓
-Temporal Feature Engineering
-(hour / week_day extraction)
-        ↓
-Data Filtering by Time Slot
-        ↓
-Feature Scaling
-(StandardScaler)
-        ↓
-Spatial Clustering
-(KMeans / DBSCAN comparison)
-        ↓
-Cluster Evaluation
-(Silhouette / DB Index / CH Index)
-        ↓
-Hot-Zone Identification
-(cluster centroids)
-        ↓
-Driver Positioning Recommendation
-
-Each model is trained independently for:
-
--> Each day of the week
--> All hourly demand observations
-
-This allows operational recommendations to adapt dynamically to recurring demand patterns.
+This problem is formulated as an unsupervised spatial clustering task, where pickup latitude and longitude are used to infer geographical demand concentration.
 
 ## Dataset
 
-| Property        | Value                               |
-| --------------- | ----------------------------------- |
-| Source          | Uber NYC Pickups                    |
-| Period          | April 2014                          |
-| Volume          | ~564,000 pickups                    |
-| Sample Used     | 10,000 observations                 |
-| Sampling Method | Random sampling (`random_state=42`) |
+The dataset contains historical Uber pickup records in New York City for April 2014 (~564,000 observations).
 
+Each record includes:
 
-Each record contains:
+- pickup timestamp
 
-- Pickup date and time
+- pickup latitude
 
-- Latitude & longitude
+- pickup longitude
 
-- Dispatch base identifier
+- dispatch base identifier
 
-## Feature Engineering
+To reduce computational cost during clustering tuning, a random sample of 10,000 observations was used (random_state = 42) without significantly altering spatial demand distribution.
 
-Temporal variables were extracted from the pickup timestamp:
+## Modeling Approach
 
-- hour → Hour of the day
+### Temporal Feature Engineering
 
-- week_day → Day of the week
+In order to account for recurring demand patterns, two temporal variables were extracted from the pickup timestamp:
 
-These engineered features enable:
+- hour → hour of the day
 
-- Time-specific demand filtering
+- week_day → day of the week
 
-- Model training per operational time slot
+These engineered features allow the training of time-specific models (e.g., Monday at 6PM), reflecting real operational demand fluctuations.
 
-- Demand segmentation by recurring weekly patterns
+### Algorithm Benchmark — KMeans vs DBSCAN
 
-## Model Comparison
-
-Two clustering algorithms were evaluated:
+Two clustering algorithms were evaluated to segment pickup locations into geographical demand zones:
 
 KMeans
 
-- Assigns each pickup to one of k clusters
+- assigns each pickup to a predefined cluster
 
-- Covers 100% of observations
-
-- Requires predefined number of clusters
+- guarantees full spatial assignment
 
 DBSCAN
 
-- Automatically detects dense spatial regions
+- detects dense spatial regions
 
-- Identifies noise (isolated pickups)
+- classifies isolated pickups as noise
 
-- Requires eps and min_samples
+Clustering performance was evaluated using internal validation metrics:
 
-### Model Evaluation (Monday — 6 PM)
+- Silhouette Score
 
-| Metric                  | KMeans | DBSCAN |
-| ----------------------- | ------ | ------ |
-| Silhouette Score        | 0.41   | —      |
-| Davies-Bouldin Index    | 0.47   | —      |
-| Calinski-Harabasz Index | 121.20 | —      |
-| Operational Coverage    | 100%   | 22%    |
+- Davies–Bouldin Index
 
-DBSCAN detected only one valid cluster and classified 78% of pickups as noise, preventing actionable operational recommendations.
+- Calinski–Harabasz Index
 
--> KMeans was selected as the final model
+as well as an additional operational metric:
 
-### Operational Hot-Zones
+-> Actionable Coverage Rate (ACR)
+representing the proportion of pickups assigned to a usable cluster.
 
-A KMeans model with k = 8 clusters was trained independently for each day of the week.
+### Operational Model Selection (Monday — 6PM)
+
+| Metric                   | KMeans | DBSCAN |
+| ------------------------ | ------ | ------ |
+| Silhouette Score         | 0.41   | —      |
+| Davies-Bouldin Index     | 0.47   | —      |
+| Calinski-Harabasz Index  | 121.20 | —      |
+| Actionable Coverage Rate | 100%   | 22%    |
+
+DBSCAN classified nearly 78% of pickups as noise, preventing their translation into actionable positioning recommendations.
+
+Although capable of detecting dense areas, the algorithm failed to provide sufficient spatial segmentation for operational deployment.
+
+KMeans, on the other hand, ensured full spatial assignment and usable demand zones.
+
+-> KMeans was therefore selected as the final model based on operational usability rather than clustering performance alone.
+
+### Weekday-Specific Hot-Zones Detection
+
+A KMeans model (k = 8) was trained independently for each day of the week.
 
 Cluster centroids represent:
 
-- Recommended positioning zones for drivers
-- Recurring demand hotspots
+- recurring pickup demand zones
+
+- recommended positioning areas for drivers
 
 Demand patterns vary significantly:
 
-- Weekdays → High concentration in Midtown & Lower Manhattan
+- Weekdays → strong concentration in Midtown and Lower Manhattan
 
-- Weekends → More spatially distributed demand
+- Other days → more spatially distributed ride requests
 
-## Reproducibility
+This suggests that optimal driver positioning strategies should dynamically adapt depending on the day of the week.
 
-### Clone the repository
+## Business Impact
 
-git clone https://github.com/BadreddinB/CDSD.git
-cd CDSD/Bloc_3_IA_Predictive_Structuree/Uber_Pickups
+By recommending positioning zones based on recurring spatial demand patterns, Uber can:
 
-### Install dependencies
+- reduce passenger waiting time
 
-pip install -r requirements.txt
+- improve driver utilization
 
-### Dataset location
-Place the dataset in:
+- increase ride completion rates
 
-Uber_Pickups/data/uber-raw-data-apr14.csv
+- decrease cancellation probability
 
-### Run the pipeline
+- optimize supply-demand matching
 
-uber.ipynb
+This approach supports proactive fleet allocation and helps maintain waiting time below the critical 5–7 minute threshold.
 
-## Project Structure
+## Repository Structure
 
-Uber_Pickups/
+### Uber_Pickups/
 │
 ├── data/
 │   └── uber-raw-data-apr14.csv
@@ -180,17 +152,23 @@ Uber_Pickups/
 ├── uber.ipynb
 └── README.md
 
-## Business Impct
+## Reproducibility
 
-By recommending dynamic positioning zones based on recurring demand patterns, Uber can:
+### Clone the repository:
 
-- Reduce passenger waiting time
+git clone https://github.com/BadreddinB/CDSD.git
 
-- Improve ride completion rates
+### Navigate to the project folder:
 
-- Increase driver utilization
+cd CDSD/Bloc_3_IA_Predictive_Structuree/Uber_Pickups
 
-- Optimize supply-demand matching
+### Place the dataset in:
 
-This predictive approach enables proactive driver positioning to maintain waiting times below the critical 5–7 minute threshold.
+Uber_Pickups/data/uber-raw-data-apr14.csv
+
+### Run the notebook:
+
+jupyter notebook uber.ipynb
+
+
 
