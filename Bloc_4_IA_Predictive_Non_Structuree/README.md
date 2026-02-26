@@ -1,204 +1,156 @@
 # SMS Spam Detection using Deep Learning
 
-## Business Problem
+## Business Context
 
-AT&T processes millions of SMS messages every day.
+Telecommunication operators such as AT&T process millions of SMS messages every day. Among them, an increasing proportion consists of unsolicited or potentially malicious messages (spam), which negatively impacts user experience and reduces trust in communication services.
 
-A growing proportion of these messages are unsolicited or malicious (spam), negatively impacting:
+Manual moderation approaches are no longer scalable given the volume of exchanged messages.
 
-- User experience
+Developing an automated system capable of classifying SMS messages based solely on their textual content would allow AT&T to:
 
-- Trust in the network
+- Protect users from unwanted or fraudulent communications
 
-- Customer retention
+- Improve customer satisfaction
 
-- Support workload
+- Reduce manual moderation workload
 
-Manual filtering methods do not scale to this volume.
+- Enable real-time filtering at network level
 
-The objective of this project is therefore to design an automated deep learning pipeline capable of classifying SMS messages as:
+## Project Objective
 
-- Spam
+The objective of this project is to design a deep learning pipeline capable of automatically classifying SMS messages as either:
 
-- Ham (legitimate message)
+- Spam — unsolicited or malicious message
 
-based solely on their textual content.
+- Ham — legitimate message
 
-This system could ultimately support real-time filtering at network level.
-
-## Analytical Objective
-
-The problem is formulated as a binary text classification task on non-structured data.
-
-Given an SMS message:
-
-Predict whether the message should be filtered as spam before reaching the end user.
-
-A key business constraint is the high cost of false negatives:
-
--> A spam message incorrectly classified as legitimate directly reaches the user.
-
-Therefore, model selection focuses on:
-
-- Spam Recall
-rather than overall accuracy.
-
-## AI Pipeline Architecture
-
-Raw SMS Messages
-        ↓
-Text Cleaning
-(lowercase / punctuation removal)
-        ↓
-Tokenization
-(Keras Tokenizer)
-        ↓
-Sequence Padding
-(maxlen = 100)
-        ↓
-Label Encoding
-(ham = 0 / spam = 1)
-        ↓
-Class Imbalance Handling
-(GAN-based augmentation)
-        ↓
-Model Training
-Baseline LSTM
-GloVe + LSTM
-DistilBERT
-        ↓
-Model Evaluation
-(F1 / Recall)
-        ↓
-Final Model Selection
-(Business-driven metric)
+This task falls under predictive analysis on unstructured textual data, where the final model should generalize effectively to unseen messages.
 
 ## Dataset
 
-| Property        | Value              |
-| --------------- | ------------------ |
-| Dataset size    | 5,572 SMS messages |
-| Spam messages   | ~13%               |
-| Ham messages    | ~87%               |
-| Missing values  | None               |
-| Target variable | Spam / Ham         |
+The dataset contains 5,572 SMS messages, each labeled as either spam or ham.
 
-The dataset is strongly imbalanced, requiring specific treatment during training.
+The class distribution is imbalanced:
 
-## Text Preprocessing
+- 87% legitimate messages
 
-A custom cleaning pipeline was applied:
+- 13% spam messages
 
-- Lowercasing
+No missing values were observed in the dataset.
 
-- Removal of punctuation and special characters
+## Modeling Pipeline
 
-- Stopwords removal (NLTK)
+### Baseline Deep Learning Model — LSTM
 
-- Porter stemming
+A first LSTM-based neural network was implemented as a baseline model.
 
-⚠️ A lighter preprocessing pipeline (without stemming) was used for transfer learning models in order to preserve the linguistic structure expected by pretrained embeddings.
+Text messages were:
 
-## Model Development
+- Lowercased
 
-### Baseline Model — LSTM
+- Cleaned from punctuation and special characters
 
-A sequential neural network including:
+- Tokenized
 
-- Trainable embedding layer
+- Stemmed
 
-- LSTM layer
+- Converted into padded numerical sequences
 
-- Sigmoid output
+The model architecture includes:
 
-Results:
+- An embedding layer
 
-- Accuracy: 98%
+- An LSTM layer
 
-- Spam Recall: 89%
+- A sigmoid output layer
 
-- Spam F1-score: 0.94
+Although the model achieved high overall accuracy (~98%), the spam recall remained limited (89%), meaning that some spam messages were still incorrectly classified as legitimate.
 
-This provides a strong baseline but remains sensitive to class imbalance.
+From a business perspective, these false negatives represent spam messages reaching end users.
 
-### Handling Class Imbalance — GAN Augmentation
+### Data Augmentation using GAN
 
-A Generative Adversarial Network (GAN) was trained on spam messages to generate:
+In order to address class imbalance, a Generative Adversarial Network (GAN) was implemented to synthetically generate additional spam messages.
 
--> 500 synthetic spam samples
+The GAN was trained exclusively on spam sequences in order to enrich the minority class.
 
-These generated messages were added to the training dataset in order to:
+This approach allows the construction of an augmented training dataset without relying on simple oversampling techniques.
 
-- Improve class representation
+The enriched dataset improves the model’s exposure to spam-related patterns during training.
 
-- Increase model exposure to spam patterns
+### Transfer Learning — GloVe Embeddings
 
-- Reduce bias towards the majority class
+A second LSTM model was trained using pretrained GloVe word embeddings.
 
-### Transfer Learning — GloVe + LSTM
+A lighter preprocessing pipeline was applied to preserve linguistic structure required by pretrained embeddings.
 
-Pretrained GloVe word embeddings (100-dimensional) were integrated as a frozen embedding layer.
+Despite improving semantic representation of words, the model achieved:
 
-Results:
+- 97% overall accuracy
 
-- Accuracy: 97%
+- 86% spam recall
 
-- Spam Recall: 86%
+Static embeddings showed limitations in capturing semantic variability in short SMS messages.
 
-- Spam F1-score: 0.92
+### Contextual Transfer Learning — DistilBERT
 
-Static embeddings show limitations on short informal text messages.
+Finally, a transformer-based architecture (DistilBERT) was fine-tuned on the GAN-augmented dataset.
 
-### Transfer Learning — DistilBERT
+Unlike static embeddings such as GloVe, DistilBERT generates contextual representations where each word’s meaning depends on its surrounding context.
 
-A fine-tuned DistilBERT transformer model was trained on the GAN-augmented dataset.
+This model achieved:
 
-Unlike GloVe, DistilBERT generates contextual embeddings where each word representation depends on its surrounding context.
+- 98% accuracy
 
-Results:
+- 99% spam recall
 
-- Accuracy: 98%
+Out of 252 spam messages in the test set, 249 were correctly identified, with only 3 missed instances.
 
-- Spam Recall: 99%
+## Model Comparison
 
-- Spam F1-score: 0.96
+| Model                        | Accuracy | Spam Recall | Spam F1-Score |
+| ---------------------------- | -------- | ----------- | ------------- |
+| Baseline LSTM                | 98%      | 89%         | 0.94          |
+| GloVe + LSTM (GAN-Augmented) | 97%      | 86%         | 0.92          |
+| DistilBERT (GAN-Augmented)   | 98%      | 99%         | 0.96          |
 
-249 out of 252 spam messages were correctly identified.
+DistilBERT provides the best performance in terms of spam detection, which is the most business-critical metric in this context.
 
-### Model Comparison
+## Business Impact
 
-| Model         | Accuracy | Spam Recall | Spam F1 |
-| ------------- | -------- | ----------- | ------- |
-| Baseline LSTM | 98%      | 89%         | 0.94    |
-| GloVe + LSTM  | 97%      | 86%         | 0.92    |
-| DistilBERT    | 98%      | **99%**     | 0.96    |
+Improving spam recall directly reduces the number of unsolicited or fraudulent messages reaching end users.
 
--> DistilBERT was selected as the final model
+At network scale, even a small improvement in spam detection performance may significantly:
 
-due to its superior spam recall — the most critical business metric.
+- Enhance customer experience
 
-## Reproducibility
+- Reduce exposure to phishing attempts
 
-### Clone the repository
+- Limit user complaints
 
-git clone https://github.com/BadreddinB/CDSD.git
-cd CDSD/Bloc_4_IA_Predictive_Non_Structuree/AT&T
+- Decrease downstream moderation workload
 
-### Install dependencies
+By integrating contextual deep learning models such as DistilBERT into SMS filtering pipelines, telecommunication providers can improve service reliability while maintaining scalable automated content moderation.
 
-pip install -r requirements.txt
+## Repository Structure
 
-### Download required resources
+Bloc_4_IA_Predictive_Non_Structuree/
+│
+├── AT&T.ipynb
+├── spam.csv
+├── glove.6B.50d.txt*
+├── glove.6B.100d.txt*
+├── glove.6B.200d.txt*
+├── glove.6B.300d.txt*
+└── README.md
 
-Due to GitHub file size limitations (>100MB), the pretrained GloVe embeddings are not included in this repository.
+* GloVe embedding files are required for the transfer learning section and may not be included in the GitHub repository due to file size limitations.
 
-Download them manually from the official Stanford NLP repository:
+* How to download Glove:
 
-👉 https://nlp.stanford.edu/projects/glove/
+* Download them manually from the official Stanford NLP repository -> https://nlp.stanford.edu/projects/glove/
 
-Download:
-
-glove.6B.zip
+  glove.6B.zip
 
 Then extract the following files into the same directory as the notebook:
 
@@ -207,36 +159,24 @@ glove.6B.100d.txt
 glove.6B.200d.txt
 glove.6B.300d.txt
 
-Make sure the project structure matches:
+## Reproductibility
 
-AT&T/
-│
-├── AT&T.ipynb
-├── spam.csv
-├── glove.6B.50d.txt
-├── glove.6B.100d.txt
-├── glove.6B.200d.txt
-├── glove.6B.300d.txt
-└── README.md
+### Clone the repository:
 
-⚠️The notebook loads these files using relative paths.
-Moving them to another directory may prevent the code from executing correctly.
+git clone https://github.com/BadreddinB/CDSD.git
 
-### Dataset location
-spam.csv
+### Navigate to the project folder:
 
-## Run the notebook
+cd CDSD/Bloc_4_IA_Predictive_Non_Structuree
 
-AT&T.ipynb
+### Place the following files in the same directory as the notebook:
 
-GloVe embeddings and DistilBERT weights will be automatically downloaded during first execution.
+- spam.csv
 
-## Project Structure on GIT Hub
+- glove.6B.100d.txt
 
-Bloc_4_IA_Predictive_Non_Structuree/
-│
-├── AT&T.ipynb
-├── spam.csv
-└── README.md
+### Run the notebook:
 
+jupyter notebook AT&T.ipynb
 
+DistilBERT weights will be automatically downloaded on first run.
