@@ -188,6 +188,40 @@ cd CDSD/Bloc_4_IA_Predictive_Non_Structuree/AT&T
 
 pip install -r requirements.txt
 
+### Download required resources
+
+Due to GitHub file size limitations (>100MB), the pretrained GloVe embeddings are not included in this repository.
+
+Download them manually from the official Stanford NLP repository:
+
+👉 https://nlp.stanford.edu/projects/glove/
+
+Download:
+
+glove.6B.zip
+
+Then extract the following files into the same directory as the notebook:
+
+glove.6B.50d.txt
+glove.6B.100d.txt
+glove.6B.200d.txt
+glove.6B.300d.txt
+
+Make sure the project structure matches:
+
+AT&T/
+│
+├── AT&T.ipynb
+├── spam.csv
+├── glove.6B.50d.txt
+├── glove.6B.100d.txt
+├── glove.6B.200d.txt
+├── glove.6B.300d.txt
+└── README.md
+
+⚠️The notebook loads these files using relative paths.
+Moving them to another directory may prevent the code from executing correctly.
+
 ### Dataset location
 spam.csv
 
@@ -197,10 +231,12 @@ AT&T.ipynb
 
 GloVe embeddings and DistilBERT weights will be automatically downloaded during first execution.
 
-## Project Structure
+## Project Structure on GIT Hub
 
 Bloc_4_IA_Predictive_Non_Structuree/
 │
 ├── AT&T.ipynb
 ├── spam.csv
 └── README.md
+
+
