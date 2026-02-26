@@ -1,8 +1,8 @@
-🌤️ ClimaSense — J+1 Temperature Forecast Dashboard
+# 🌤️ ClimaSense — J+1 Temperature Forecast Dashboard
 
-ClimaSense is a data science project focused on the analysis of climatic differences between 20 French cities in 2022 and the development of a short-term temperature forecasting system (J+1) for operational decision support.
+## ClimaSense is a data science project focused on the analysis of climatic differences between 20 French cities in 2022 and the development of a short-term temperature forecasting system (J+1) for operational decision support.
 
-The project combines:
+## The project combines:
 
 - Ingestion data with OpenMeteo
 
@@ -14,11 +14,11 @@ The project combines:
 
 - An interactive Streamlit dashboard for decision-makers.
 
-Main Problematic:
+## Main Problematic:
 
 - Which elements characterize the climatic differences between French cities in 2022, and how can short-term variations (J+1) be anticipated for operational decision-making?
 
-Sub-questions:
+### Sub-questions:
 
 - How do temperatures and precipitation evolve throughout 2022?
 
@@ -28,7 +28,7 @@ Sub-questions:
 
 - To what extent can these variations be predicted at J+1?
 
-Project structure :
+## Project structure :
 
 ClimaSense/
 │
@@ -52,7 +52,7 @@ ClimaSense/
 ├── requirements.txt
 └── README.md
 
-Methodology Overview :
+## Methodology Overview :
 
 - Data source: Open-Meteo Archive API
 
@@ -60,19 +60,19 @@ Methodology Overview :
 
 - Cities: 20 French cities representing different climate zones
 
-Features:
+### Features:
 
 - Lag variables (J-1 temperatures),
 
 - Cyclical seasonal encoding (sin/cos),
 
-Validation strategy:
+### Validation strategy:
 
 - Time-based split (train: Jan–Sep, test: Oct–Dec),
 
 - TimeSeriesSplit cross-validation,
 
-Models compared:
+### Models compared:
 
 - Linear Regression ✅ (selected),
 
@@ -82,7 +82,7 @@ Models compared:
 
 Evaluation metric: MAE (°C)
 
-Key Results
+### Key Results:
 
 - National MAE (J+1): ≈ 2.5°C
 
@@ -92,7 +92,7 @@ Key Results
 
 - Linear regression outperformed more complex models due to better generalization
 
-Streamlit Decision Dashboard
+## Streamlit Decision Dashboard
 
 The Streamlit app provides:
 
@@ -108,12 +108,12 @@ The Streamlit app provides:
 
 - National comparison across cities.
 
-How to Run the Project :
+## Reproductibility :
 
 git clone https://github.com/BadreddinB/CDSD.git
 cd CDSD/Bloc_6_Direction_Projet_Data/ClimaSense
 
-Create a virtual environment :
+### Create a virtual environment :
 
 python -m venv venv
 
@@ -123,17 +123,17 @@ venv\Scripts\activate
 # macOS / Linux
 source venv/bin/activate
 
-Install dependencies
+### Install dependencies
 
 pip install -r requirements.txt
 
-Run notebooks in order :
+### Run notebooks in order :
 
 jupyter notebook notebooks/01_ingestion.ipynb
 jupyter notebook notebooks/02_eda.ipynb
 jupyter notebook notebooks/03_model.ipynb
 
-Launch the Streamlit dashboard :
+### Launch the Streamlit dashboard :
 
 streamlit run streamlit_app/app.py
 
@@ -141,7 +141,7 @@ Then open your browser at:
 
 http://localhost:8501
 
-Tech Stack :
+## Tech Stack :
 
 - Python, Pandas, NumPy
 
