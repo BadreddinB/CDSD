@@ -1,18 +1,45 @@
-# Big Data Analysis – Steam (PySpark)
+# Big Data Analysis – Steam Marketplace (PySpark)
 
-##  Project Overview
+##  Business Context
 
-This project aims to analyze the global video game market using data from the Steam platform.
+Ubisoft plans to release a new innovative video game on the global market.
 
-Using PySpark within Databricks, the objective is to explore large-scale structured data in order to identify key trends in game releases, pricing strategies, genre popularity, and user engagement.
+In order to better understand the video game ecosystem and current market trends, a global analysis of the games available on Steam’s marketplace has been conducted.
 
-##  Technologies Used
+Steam is one of the largest digital distribution platforms for video games worldwide.
+
+---
+
+## Project Objective
+
+The objective of this project is to explore the global video game market using large-scale data from Steam in order to identify key factors related to:
+
+- Game popularity
+- Review performance
+- Market trends
+- Pricing strategies
+- Genre distribution
+- Platform availability
+
+---
+
+## Technologies Used
 
 - PySpark  
 - Databricks (Free Edition)  
 - Python  
 
-##  Public Notebook Access
+---
+
+## Data Source
+
+Semi-structured dataset available at:
+
+`s3://full-stack-bigdata-datasets/Big_Data/Project_Steam/steam_game_output.json`
+
+---
+
+## Public Notebook Access
 
 Due to Databricks Free Edition limitations, the "Publish" feature is not available.
 
